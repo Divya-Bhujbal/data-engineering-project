@@ -1,0 +1,27 @@
+# Project-level settings. Change these to match your Databricks workspace.
+catalog: workspace            # Databricks Free Edition default catalog (check yours in Catalog Explorer)
+schema: lakehouse
+landing_root: /Volumes/workspace/lakehouse/landing   # Unity Catalog Volume where CSV files are dropped
+
+# Gold tables: plain SQL. Placeholders {silver_<source>} resolve to fully qualified silver tables.
+gold:
+  - name: daily_sales
+    sql: |
+      SELECT o.order_date,
+             COUNT(*)            AS orders,
+             SUM(o.amount)       AS revenue
+      FROM {silver_orders} o
+      GROUP BY o.order_date
+  - name: sales_by_category
+    sql: |
+      SELECT p.category,
+             COUNT(*)            AS orders,
+             SUM(o.amount)       AS revenue
+      FROM {silver_orders} o
+      JOIN {silver_products} p ON o.product_id = p.product_id
+      GROUP BY p.category
+  - name: customers_by_country
+    sql: |
+      SELECT country, COUNT(*) AS customers
+      FROM {silver_customers}
+      GROUP BY country

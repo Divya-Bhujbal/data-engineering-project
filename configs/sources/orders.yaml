@@ -1,0 +1,23 @@
+source: orders
+landing_subdir: orders
+format: csv
+options: {header: "true"}
+primary_key: [order_id]
+quality_gate:
+  max_error_rate: 0.30        # fail the run (and skip the silver merge) if more than 30% of records are bad
+columns:
+  - {name: order_id,    source: OrderID,    type: string}
+  - {name: customer_id, source: CustomerID, type: string}
+  - {name: product_id,  source: ProductID,  type: string}
+  - {name: order_date,  source: OrderDate,  type: date, format: "yyyy-MM-dd"}
+  - {name: quantity,    source: Quantity,   type: int}
+  - {name: amount,      source: Amount,     type: "decimal(12,2)"}
+  - {name: status,      source: Status,     type: string}
+rules:
+  - {name: customer_not_null,  type: not_null, column: customer_id}
+  - {name: amount_non_negative, type: range, column: amount, min: 0}
+  - {name: quantity_positive,  type: range, column: quantity, min: 1, max: 1000}
+  - {name: status_allowed,     type: allowed_values, column: status, values: [PLACED, SHIPPED, DELIVERED, CANCELLED]}
+  - {name: customer_exists,    type: referential, column: customer_id, ref_source: customers, ref_column: customer_id}
+  - {name: product_exists,     type: referential, column: product_id,  ref_source: products,  ref_column: product_id, severity: warn}
+  - {name: amount_matches_qty, type: expression, expr: "amount IS NULL OR quantity IS NULL OR amount >= quantity * 0.01", severity: warn}

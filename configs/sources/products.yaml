@@ -1,0 +1,13 @@
+source: products
+landing_subdir: products
+format: csv
+options: {header: "true"}
+primary_key: [product_id]
+columns:
+  - {name: product_id,   source: ProductID,   type: string}
+  - {name: product_name, source: ProductName, type: string}
+  - {name: category,     source: Category,    type: string}
+  - {name: unit_price,   source: UnitPrice,   type: "decimal(10,2)"}
+rules:
+  - {name: price_positive, type: range, column: unit_price, min: 0.01}
+  - {name: category_not_null, type: not_null, column: category}

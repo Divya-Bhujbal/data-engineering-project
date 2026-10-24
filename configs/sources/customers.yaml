@@ -1,0 +1,15 @@
+source: customers
+landing_subdir: customers
+format: csv
+options: {header: "true"}
+primary_key: [customer_id]
+columns:
+  - {name: customer_id, source: CustomerID, type: string}
+  - {name: full_name,   source: FullName,   type: string}
+  - {name: email,       source: Email,      type: string}
+  - {name: country,     source: Country,    type: string}
+  - {name: signup_date, source: SignupDate, type: date, format: "yyyy-MM-dd"}
+rules:
+  - {name: name_not_null,  type: not_null, column: full_name}
+  - {name: email_format,   type: regex,    column: email, pattern: "^[^@\\s]+@[^@\\s]+\\.[a-zA-Z]{2,}$"}
+  - {name: country_allowed, type: allowed_values, column: country, values: [IN, US, GB, DE, SG], severity: warn}

@@ -1,0 +1,3 @@
+pyyaml
+pytest
+# pyspark is preinstalled on Databricks; add `pyspark` + `delta-spark` only for local runs
